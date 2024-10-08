@@ -5,11 +5,11 @@ const Welcome: React.FC = () => {
   return (
     <View style={styles.topSection}>
       <Image
-        source={require('../assets/softcode_horizontal_transp.png')}
+        source={require('../assets/softcode_logo.png')}
         style={styles.logo}
         />
       <Text style={styles.welcomeText}>Welcome to</Text>
-      <Text style={styles.welcomeText}>SoftCode Sign</Text>
+      <Text style={styles.welcomeText}>Softcode Sign</Text>
     </View>
   );
 };
