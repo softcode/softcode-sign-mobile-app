@@ -1,36 +1,36 @@
 import React from 'react';
-import { View, Button, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import Welcome from '../components/Welcome';
+import styles from '../styles/GlobalStyles';
 
 const HomeScreen = ({ navigation }: any) => {
   return (
-    <View style={styles.container}>
+    <View style={styles.homeContainer}>
       <Welcome />
-
       <View style={styles.bottomSection}>
-        <View style={styles.button}>
-          <Button title="Arrive" onPress={() => navigation.navigate('Arrive')} />
-        </View>
-        <View style={styles.button}>
-          <Button title="Leave" onPress={() => navigation.navigate('Leave')} />
-        </View>
+        <TouchableOpacity
+          style={styles.customButton}
+          onPress={() => navigation.navigate('Arrive')}
+        >
+          <Text style={styles.buttonText}>Sign In</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.customButton}
+          onPress={() => navigation.navigate('Leave')}
+        >
+          <Text style={styles.buttonText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.bottomLink}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('EmployeeLogout')}
+        >
+          <Text style={styles.linkText}>Employee Logout</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
-  },
-  bottomSection: {
-    marginBottom: 50,
-  },
-  button: {
-    marginBottom: 20,
-  },
-});
 
 export default HomeScreen;
