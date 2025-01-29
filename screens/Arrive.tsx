@@ -12,6 +12,13 @@ const Arrive: React.FC = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [errors, setErrors] = useState({
+    firstName: false,
+    lastName: false,
+    phone: false,
+    host: false,
+  });
+
   const fetchHostSuggestions = async (text: string) => {
     if (text.length < 3) {
       setSuggestions([]);
@@ -32,41 +39,39 @@ const Arrive: React.FC = () => {
     } finally {
       setLoading(false);
     }
-    console.log("Test");
   };
 
   const handleHostChange = (text: string) => {
     setHost(text);
-    fetchHostSuggestions(text); 
+    fetchHostSuggestions(text);
   };
 
   const handleSuggestionSelect = (suggestion: string) => {
     setHost(suggestion);
-    setSuggestions([]); 
+    setSuggestions([]);
   };
 
   const validateInputs = () => {
-    if (!firstName || !lastName || !company || !email || !phone || !host) {
-      Alert.alert('Error', 'All fields are required.');
-      return false;
-    }
+    const newErrors = {
+      firstName: !firstName,
+      lastName: !lastName,
+      phone: !phone,
+      host: !host,
+    };
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert('Error', 'Please enter a valid email address.');
-      return false;
-    }
+    setErrors(newErrors);
 
-    const phoneRegex = /^\+?[0-9]{10,}$/;
-    if (!phoneRegex.test(phone)) {
-      Alert.alert('Error', 'Please enter a valid phone number.');
+    if (Object.values(newErrors).includes(true)) {
+      Alert.alert('Error', 'First name, last name, phone number, and host are required.');
       return false;
     }
 
     return true;
   };
 
-  const handleSubmit = async () => {    
+  const handleSubmit = async () => {
+    if (!validateInputs()) return;
+
     const visitorData = {
       visitorFirstName: firstName,
       visitorLastName: lastName,
@@ -75,14 +80,14 @@ const Arrive: React.FC = () => {
       visitorPhoneNumber: phone,
       visitorHostEmail: host,
     };
-    
+
     try {
       const response = await fetch('http://localhost:8097/visitor/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(visitorData), 
+        body: JSON.stringify(visitorData),
       });
 
       if (response.ok) {
@@ -107,53 +112,57 @@ const Arrive: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Please Sign Up</Text>
-      
+
       <TextInput
-        style={styles.input}
-        placeholder="Visitor First Name"
+        style={[styles.input, errors.firstName && styles.inputError]}
+        placeholder="First Name"
         value={firstName}
         onChangeText={setFirstName}
       />
+      {errors.firstName && <Text style={styles.errorText}>Required</Text>}
 
       <TextInput
-        style={styles.input}
-        placeholder="Visitor Last Name"
+        style={[styles.input, errors.lastName && styles.inputError]}
+        placeholder="Last Name"
         value={lastName}
         onChangeText={setLastName}
       />
+      {errors.lastName && <Text style={styles.errorText}>Required</Text>}
 
       <TextInput
         style={styles.input}
-        placeholder="Visitor Organization Name"
+        placeholder="Organization Name (Optional)"
         value={company}
         onChangeText={setCompany}
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Visitor Email"
+        placeholder="Email (Optional)"
         value={email}
         onChangeText={setEmail}
-        keyboardType="email-address" 
+        keyboardType="email-address"
         autoCapitalize="none"
       />
 
       <TextInput
-        style={styles.input}
-        placeholder="Visitor Phone Number"
+        style={[styles.input, errors.phone && styles.inputError]}
+        placeholder="Phone Number"
         value={phone}
         onChangeText={setPhone}
         keyboardType="phone-pad"
       />
+      {errors.phone && <Text style={styles.errorText}>Required</Text>}
 
       <TextInput
-        style={styles.input}
-        placeholder="Visitor Host Email"
+        style={[styles.input, errors.host && styles.inputError]}
+        placeholder="Host Email"
         value={host}
         onChangeText={handleHostChange}
         keyboardType="email-address"
         autoCapitalize="none"
       />
+      {errors.host && <Text style={styles.errorText}>Required</Text>}
 
       {suggestions.length > 0 && (
         <FlatList
