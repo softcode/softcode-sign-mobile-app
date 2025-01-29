@@ -104,6 +104,18 @@ const GlobalStyles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 10,
   },
+  text: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+  },
+  subText: {
+    fontSize: 18,
+    color: '#555',
+    marginTop: 10,
+    textAlign: 'center',
+  },
 });
 
 export default GlobalStyles;

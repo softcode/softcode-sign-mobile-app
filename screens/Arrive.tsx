@@ -53,7 +53,6 @@ const Arrive: React.FC = () => {
       if (response.ok) {
         Alert.alert('Success', 'Visitor signed up successfully!');
 
-        // Clear input fields
         setFirstName('');
         setLastName('');
         setCompany('');
@@ -62,10 +61,8 @@ const Arrive: React.FC = () => {
         setHost('');
         setSuggestions([]);
 
-        // Navigate to Welcome screen
-        navigation.navigate('Welcome');
+        navigation.navigate('Welcome', { firstName });
 
-        // Return to Arrive screen after 6 seconds
         setTimeout(() => {
           navigation.navigate('Arrive');
         }, 6000);

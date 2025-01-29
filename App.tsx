@@ -6,6 +6,7 @@ import Arrive from './screens/Arrive';
 import Leave from './screens/Leave';
 import Welcome from './components/Welcome';
 import EmployeeLogoutScreen from './screens/EmployeeLogout';
+import WelcomeScreen from './screens/WelcomeScreen';
 
 type RootStackParamList = {
   Home: undefined;
@@ -24,7 +25,7 @@ const App: React.FC = () => {
         <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
         <Stack.Screen name="Arrive" component={Arrive} options={{ title: 'Arrive' }} />
         <Stack.Screen name="Leave" component={Leave} options={{ title: 'Leave' }} />
-        <Stack.Screen name="Welcome" component={Welcome} />
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen
           name="EmployeeLogout"
           component={EmployeeLogoutScreen}
