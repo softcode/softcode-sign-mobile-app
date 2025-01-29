@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, FlatList, TouchableOpacity, Alert } from 'react-native';
 import styles from '../styles/GlobalStyles';
 
-const ArriveScreen: React.FC = () => {
-  const [name, setName] = useState('');
+const Arrive: React.FC = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [company, setCompany] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -45,7 +46,7 @@ const ArriveScreen: React.FC = () => {
   };
 
   const validateInputs = () => {
-    if (!name || !company || !email || !phone || !host) {
+    if (!firstName || !lastName || !company || !email || !phone || !host) {
       Alert.alert('Error', 'All fields are required.');
       return false;
     }
@@ -67,7 +68,8 @@ const ArriveScreen: React.FC = () => {
 
   const handleSubmit = async () => {    
     const visitorData = {
-      visitorName: name,
+      visitorFirstName: firstName,
+      visitorLastName: lastName,
       visitorOrganizationName: company,
       visitorEmail: email,
       visitorPhoneNumber: phone,
@@ -85,7 +87,8 @@ const ArriveScreen: React.FC = () => {
 
       if (response.ok) {
         Alert.alert('Success', 'Visitor signed up successfully!');
-        setName('');
+        setFirstName('');
+        setLastName('');
         setEmail('');
         setPhone('');
         setHost('');
@@ -107,9 +110,16 @@ const ArriveScreen: React.FC = () => {
       
       <TextInput
         style={styles.input}
-        placeholder="Visitor Name"
-        value={name}
-        onChangeText={setName}
+        placeholder="Visitor First Name"
+        value={firstName}
+        onChangeText={setFirstName}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Visitor Last Name"
+        value={lastName}
+        onChangeText={setLastName}
       />
 
       <TextInput
@@ -166,4 +176,4 @@ const ArriveScreen: React.FC = () => {
   );
 };
 
-export default ArriveScreen;
+export default Arrive;
