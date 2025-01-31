@@ -137,33 +137,34 @@ const Arrive: React.FC = () => {
 
       <TextInput style={[styles.input, errors.phone && styles.inputError]} placeholder="Phone Number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
       {errors.phone && <Text style={styles.errorText}>Required</Text>}
-
-      <TextInput
-        style={[styles.input, errors.host && styles.inputError]}
-        placeholder="Host Name"
-        value={host}
-        onChangeText={handleHostChange}
-        autoCapitalize="words"
-      />
-      {errors.host && <Text style={styles.errorText}>Required</Text>}
-
-      {isFetching && <Text>Loading...</Text>}
-
-      {suggestions.length > 0 && (
-        <FlatList
-          data={suggestions}
-          keyExtractor={(item) => item.email}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handleSuggestionClick(item)}>
-              <Text style={styles.suggestionText}>{item.firstName} {item.lastName}</Text>
-            </TouchableOpacity>
-          )}
+      <View style={styles.formGroup}>
+        <TextInput
+          style={[styles.input, errors.host && styles.inputError]}
+          placeholder="Host Name"
+          value={host}
+          onChangeText={handleHostChange}
+          autoCapitalize="words"
         />
-      )}
+        {errors.host && <Text style={styles.errorText}>Required</Text>}
 
-      <TouchableOpacity style={styles.customButton} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+        {isFetching && <Text>Loading...</Text>}
+        <View style={styles.suggestionsContainer}>
+          {suggestions.length > 0 && (
+            <FlatList
+              data={suggestions}
+              keyExtractor={(item) => item.email}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => handleSuggestionClick(item)}>
+                  <Text style={styles.suggestionText}>{item.firstName} {item.lastName}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+        </View>
+        <TouchableOpacity style={styles.customButton} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
