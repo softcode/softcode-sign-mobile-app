@@ -4,6 +4,13 @@ import { useNavigation } from '@react-navigation/native';
 import styles from '../styles/GlobalStyles';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+interface Employee {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
 const Arrive: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
   const [firstName, setFirstName] = useState('');
@@ -12,7 +19,9 @@ const Arrive: React.FC = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [host, setHost] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [hostEmail, setHostEmail] = useState('');
+  const [suggestions, setSuggestions] = useState<Employee[]>([]);
+  const [isFetching, setIsFetching] = useState(false);
   const [errors, setErrors] = useState({ firstName: false, lastName: false, phone: false, host: false });
 
   const validateInputs = () => {
@@ -31,16 +40,51 @@ const Arrive: React.FC = () => {
     return true;
   };
 
+  const fetchHostSuggestions = async (query: string) => {
+    if (query.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+
+    setIsFetching(true);
+    try {
+      const response = await fetch(`http://localhost:8097/visitor/employee/search?name=${encodeURIComponent(query)}`);
+      if (response.ok) {
+        const data: Employee[] = await response.json();
+        setSuggestions(data.slice(0, 3));
+      } else {
+        console.error('Failed to fetch host suggestions:', response.statusText);
+        setSuggestions([]);
+      }
+    } catch (error) {
+      console.error('Error fetching host suggestions:', error);
+      setSuggestions([]);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const handleHostChange = (text: string) => {
+    setHost(text);
+    fetchHostSuggestions(text);
+  };
+
+  const handleSuggestionClick = (employee: Employee) => {
+    setHost(`${employee.firstName} ${employee.lastName}`);
+    setHostEmail(employee.email);
+    setSuggestions([]);
+  };
+
   const handleSubmit = async () => {
     if (!validateInputs()) return;
 
     const visitorData = {
       visitorFirstName: firstName,
       visitorLastName: lastName,
-      visitorOrganizationName: company,
-      visitorEmail: email,
+      visitorOrganizationName: company.trim() === "" ? null : company,
+      visitorEmail: email.trim() === "" ? null : email,
       visitorPhoneNumber: phone,
-      visitorHostEmail: host,
+      visitorHostEmail: hostEmail,
     };
 
     try {
@@ -59,6 +103,7 @@ const Arrive: React.FC = () => {
         setEmail('');
         setPhone('');
         setHost('');
+        setHostEmail('');
         setSuggestions([]);
 
         navigation.navigate('Welcome', { firstName });
@@ -93,16 +138,24 @@ const Arrive: React.FC = () => {
       <TextInput style={[styles.input, errors.phone && styles.inputError]} placeholder="Phone Number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
       {errors.phone && <Text style={styles.errorText}>Required</Text>}
 
-      <TextInput style={[styles.input, errors.host && styles.inputError]} placeholder="Host Email" value={host} onChangeText={setHost} keyboardType="email-address" autoCapitalize="none" />
+      <TextInput
+        style={[styles.input, errors.host && styles.inputError]}
+        placeholder="Host Name"
+        value={host}
+        onChangeText={handleHostChange}
+        autoCapitalize="words"
+      />
       {errors.host && <Text style={styles.errorText}>Required</Text>}
+
+      {isFetching && <Text>Loading...</Text>}
 
       {suggestions.length > 0 && (
         <FlatList
           data={suggestions}
-          keyExtractor={(item) => item}
+          keyExtractor={(item) => item.email}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => setHost(item)}>
-              <Text style={styles.suggestionText}>{item}</Text>
+            <TouchableOpacity onPress={() => handleSuggestionClick(item)}>
+              <Text style={styles.suggestionText}>{item.firstName} {item.lastName}</Text>
             </TouchableOpacity>
           )}
         />
