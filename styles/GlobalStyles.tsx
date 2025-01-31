@@ -31,7 +31,8 @@ const GlobalStyles = StyleSheet.create({
     marginVertical: 10,        
     borderRadius: 5,           
     alignItems: 'center',
-    width: "48%"
+    width: '48%',
+    margin: 'auto'
   },
   buttonText: {
     color: 'white',            
@@ -115,6 +116,25 @@ const GlobalStyles = StyleSheet.create({
     color: '#555',
     marginTop: 10,
     textAlign: 'center',
+  },
+  formGroup: {
+    position: 'relative' as const,
+    width: '100%',
+  },
+  suggestionsContainer: {
+    position: 'absolute' as const,
+    top: 50,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    backgroundColor: 'white',
+    borderRadius: 4,
+    marginTop: 5,
+    maxHeight: 200,
+  },
+  loading: {
+    padding: 12,
+    color: '#666',
   },
 });
 
