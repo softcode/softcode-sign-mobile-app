@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, StyleSheet } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import styles from '../styles/GlobalStyles';
 
 interface Visitor {
@@ -15,6 +17,7 @@ const Leave: React.FC = () => {
   const [suggestions, setSuggestions] = useState<Visitor[]>([]);
   const [activeVisitors, setActiveVisitors] = useState<Visitor[]>([]);
   const [visitorId, setVisitorId] = useState<number | null>(null);
+  const navigation = useNavigation<StackNavigationProp<any>>();
 
   useEffect(() => {
     const fetchActiveVisitors = async () => {
@@ -98,6 +101,13 @@ const Leave: React.FC = () => {
         setIdentifier("");
         setVisitorId(null);
         setSuggestions([]);
+
+        navigation.navigate('Thanks');
+
+        const timeoutId = setTimeout(() => {
+          navigation.navigate("Leave");
+        }, 6000);
+        return () => clearTimeout(timeoutId);
       } else {
         const errorData = await response.json();
         Alert.alert("Error", errorData.message || "Failed to log out the visitor.");
