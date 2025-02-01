@@ -48,10 +48,10 @@ const Leave: React.FC = () => {
     if (text.length >= 3) {
       const matches = activeVisitors.filter(
         (visitor) =>
-          visitor.visitorFirstName.toLowerCase().includes(text.toLowerCase()) ||
-          visitor.visitorLastName.toLowerCase().includes(text.toLowerCase()) ||
-          visitor.visitorEmail.toLowerCase().includes(text.toLowerCase()) ||
-          visitor.visitorPhoneNumber.includes(text)
+          (visitor.visitorFirstName && visitor.visitorFirstName.toLowerCase().includes(text.toLowerCase())) ||
+          (visitor.visitorLastName && visitor.visitorLastName.toLowerCase().includes(text.toLowerCase())) ||
+          (visitor.visitorEmail && visitor.visitorEmail.toLowerCase().includes(text.toLowerCase())) ||
+          (visitor.visitorPhoneNumber && visitor.visitorPhoneNumber.includes(text))
       );
       setSuggestions(matches);
     } else {
