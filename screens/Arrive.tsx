@@ -8,7 +8,7 @@ interface Employee {
   id: number;
   firstName: string;
   lastName: string;
-  email: string;
+  employeeId: number;
 }
 
 const Arrive: React.FC = () => {
@@ -19,7 +19,7 @@ const Arrive: React.FC = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [host, setHost] = useState('');
-  const [hostEmail, setHostEmail] = useState('');
+  const [hostId, setHostId] = useState<number | null>(null);
   const [suggestions, setSuggestions] = useState<Employee[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const [errors, setErrors] = useState({ firstName: false, lastName: false, phone: false, host: false });
@@ -71,7 +71,7 @@ const Arrive: React.FC = () => {
 
   const handleSuggestionClick = (employee: Employee) => {
     setHost(`${employee.firstName} ${employee.lastName}`);
-    setHostEmail(employee.email);
+    setHostId(employee.employeeId);
     setSuggestions([]);
   };
 
@@ -84,7 +84,7 @@ const Arrive: React.FC = () => {
       visitorOrganizationName: company.trim() === "" ? null : company,
       visitorEmail: email.trim() === "" ? null : email,
       visitorPhoneNumber: phone,
-      visitorHostEmail: hostEmail,
+      visitorHostId: hostId,
     };
 
     try {
@@ -103,7 +103,7 @@ const Arrive: React.FC = () => {
         setEmail('');
         setPhone('');
         setHost('');
-        setHostEmail('');
+        setHostId(null);
         setSuggestions([]);
 
         navigation.navigate('Welcome', { firstName });
@@ -137,6 +137,7 @@ const Arrive: React.FC = () => {
 
       <TextInput style={[styles.input, errors.phone && styles.inputError]} placeholder="Phone Number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
       {errors.phone && <Text style={styles.errorText}>Required</Text>}
+          
       <View style={styles.formGroup}>
         <TextInput
           style={[styles.input, errors.host && styles.inputError]}
@@ -152,7 +153,7 @@ const Arrive: React.FC = () => {
           {suggestions.length > 0 && (
             <FlatList
               data={suggestions}
-              keyExtractor={(item) => item.email}
+              keyExtractor={(item) => item.employeeId.toString()} 
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleSuggestionClick(item)}>
                   <Text style={styles.suggestionText}>{item.firstName} {item.lastName}</Text>

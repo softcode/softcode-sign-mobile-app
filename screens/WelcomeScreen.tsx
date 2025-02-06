@@ -13,8 +13,8 @@ const WelcomeScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Welcome to Softcode {firstName}</Text>
-      <Text style={styles.subText}>Your host has been notified</Text>
+      <Text style={styles.text}>Welcome to Softcode {firstName}!</Text>
+      <Text style={styles.subText}>Your host has been notified!</Text>
     </View>
   );
 };
