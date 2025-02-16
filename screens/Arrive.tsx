@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, Alert } from 'react-
 import { useNavigation } from '@react-navigation/native';
 import styles from '../styles/GlobalStyles';
 import { StackNavigationProp } from '@react-navigation/stack';
+import axios from 'axios';
 
 interface Employee {
   id: number;
@@ -48,10 +49,12 @@ const Arrive: React.FC = () => {
 
     setIsFetching(true);
     try {
-      const response = await fetch(`http://localhost:8097/visitor/employee/search?name=${encodeURIComponent(query)}`);
-      if (response.ok) {
-        const data: Employee[] = await response.json();
-        setSuggestions(data.slice(0, 3));
+      const response = await axios.get(`http://localhost:8080/visitor/employee/search`, {
+        params: { name: query },
+      });
+    
+      if (response.status === 200) {
+        setSuggestions(response.data.slice(0, 3));
       } else {
         console.error('Failed to fetch host suggestions:', response.statusText);
         setSuggestions([]);
@@ -61,7 +64,7 @@ const Arrive: React.FC = () => {
       setSuggestions([]);
     } finally {
       setIsFetching(false);
-    }
+    }    
   };
 
   const handleHostChange = (text: string) => {
@@ -79,22 +82,19 @@ const Arrive: React.FC = () => {
     if (!validateInputs()) return;
 
     const visitorData = {
-      visitorFirstName: firstName,
-      visitorLastName: lastName,
-      visitorOrganizationName: company.trim() === "" ? null : company,
-      visitorEmail: email.trim() === "" ? null : email,
-      visitorPhoneNumber: phone,
-      visitorHostId: hostId,
+        visitorFirstName: firstName,
+        visitorLastName: lastName,
+        visitorOrganizationName: company.trim() === "" ? null : company,
+        visitorEmail: email.trim() === "" ? null : email,
+        visitorPhoneNumber: phone,
+        visitorHostId: hostId,
     };
 
     try {
-      const response = await fetch('http://localhost:8097/visitor/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(visitorData),
-      });
+        const response = await axios.post('http://localhost:8080/visitor/create', visitorData, {
+            headers: { 'Content-Type': 'application/json' }
+        });
 
-      if (response.ok) {
         Alert.alert('Success', 'Visitor signed up successfully!');
 
         setFirstName('');
@@ -111,10 +111,6 @@ const Arrive: React.FC = () => {
         setTimeout(() => {
           navigation.navigate('Arrive');
         }, 6000);
-      } else {
-        const errorData = await response.json();
-        Alert.alert('Error', errorData.message || 'Failed to sign up visitor.');
-      }
     } catch (error) {
       console.error('Error signing up visitor:', error);
       Alert.alert('Error', 'An error occurred while signing up.');

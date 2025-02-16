@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import styles from '../styles/GlobalStyles';
+import axios from 'axios';
 
 interface ChecklistItem {
   id: number;
@@ -18,11 +19,9 @@ const EmployeeLogoutScreen: React.FC = () => {
   useEffect(() => {
     const fetchChecklist = async () => {
       try {
-        const response = await fetch('http://localhost:8097/checklist/getallchecklists');
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          setChecklist(data);
+        const response = await axios.get('http://localhost:8080/checklist/getallchecklists');
+        if (Array.isArray(response.data)) {
+          setChecklist(response.data);
         } else {
           console.error('Invalid response format.');
         }
@@ -54,24 +53,13 @@ const EmployeeLogoutScreen: React.FC = () => {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:8097/employee/logout?pinCode=${pinCode}`,
-        {
-          method: 'POST',
-        }
-      );
-
-      const contentType = response.headers.get('content-type');
-      if (response.ok) {
+      const response = await axios.post('http://localhost:8080/employee/logout', { pinCode });
+      
+      if (response.status === 200) {
         setSuccessMessage('Logout successful.');
         setLogoutError('');
-      } else if (contentType && contentType.includes('application/json')) {
-        const errorData = await response.json();
-        setLogoutError(errorData.message || 'Logout failed. Invalid pin code.');
-        setSuccessMessage('');
       } else {
-        const errorText = await response.text();
-        setLogoutError(errorText || 'An unexpected error occurred.');
+        setLogoutError(response.statusText || 'Logout failed. Invalid PIN code.');
         setSuccessMessage('');
       }
     } catch (error) {
@@ -114,10 +102,7 @@ const EmployeeLogoutScreen: React.FC = () => {
       />
 
       <TouchableOpacity
-        style={[
-          styles.customButton,
-          { backgroundColor: allChecked ? 'black' : 'gray' },
-        ]}
+        style={[styles.customButton, { backgroundColor: allChecked ? 'black' : 'gray' }]}
         onPress={handleLogout}
         disabled={!allChecked}
       >
