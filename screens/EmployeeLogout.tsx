@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import Config from '../react-native-config';
 import styles from '../styles/GlobalStyles';
 import axios from 'axios';
 
@@ -19,7 +20,7 @@ const EmployeeLogoutScreen: React.FC = () => {
   useEffect(() => {
     const fetchChecklist = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/checklist/getallchecklists');
+        const response = await axios.get(`${Config.API_URL}/checklist/getallchecklists`);
         if (Array.isArray(response.data)) {
           setChecklist(response.data);
         } else {
@@ -53,7 +54,7 @@ const EmployeeLogoutScreen: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/employee/logout', { pinCode });
+      const response = await axios.post(`${Config.API_URL}/employee/logout`, { pinCode });
       
       if (response.status === 200) {
         setSuccessMessage('Logout successful.');

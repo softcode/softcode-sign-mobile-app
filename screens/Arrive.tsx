@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Config from '../react-native-config';
 import styles from '../styles/GlobalStyles';
 import { StackNavigationProp } from '@react-navigation/stack';
 import axios from 'axios';
@@ -46,13 +47,13 @@ const Arrive: React.FC = () => {
       setSuggestions([]);
       return;
     }
-
+  
     setIsFetching(true);
     try {
-      const response = await axios.get(`http://localhost:8080/visitor/employee/search`, {
+      const response = await axios.get(`${Config.API_URL}/visitor/employee/search`, {
         params: { name: query },
       });
-    
+  
       if (response.status === 200) {
         setSuggestions(response.data.slice(0, 3));
       } else {
@@ -64,8 +65,8 @@ const Arrive: React.FC = () => {
       setSuggestions([]);
     } finally {
       setIsFetching(false);
-    }    
-  };
+    }
+  };  
 
   const handleHostChange = (text: string) => {
     setHost(text);
@@ -80,42 +81,42 @@ const Arrive: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!validateInputs()) return;
-
+  
     const visitorData = {
-        visitorFirstName: firstName,
-        visitorLastName: lastName,
-        visitorOrganizationName: company.trim() === "" ? null : company,
-        visitorEmail: email.trim() === "" ? null : email,
-        visitorPhoneNumber: phone,
-        visitorHostId: hostId,
+      visitorFirstName: firstName,
+      visitorLastName: lastName,
+      visitorOrganizationName: company.trim() === "" ? null : company,
+      visitorEmail: email.trim() === "" ? null : email,
+      visitorPhoneNumber: phone,
+      visitorHostId: hostId,
     };
-
+  
     try {
-        const response = await axios.post('http://localhost:8080/visitor/create', visitorData, {
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        Alert.alert('Success', 'Visitor signed up successfully!');
-
-        setFirstName('');
-        setLastName('');
-        setCompany('');
-        setEmail('');
-        setPhone('');
-        setHost('');
-        setHostId(null);
-        setSuggestions([]);
-
-        navigation.navigate('Welcome', { firstName });
-
-        setTimeout(() => {
-          navigation.navigate('Arrive');
-        }, 6000);
+      const response = await axios.post(`${Config.API_URL}/visitor/create`, visitorData, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+  
+      Alert.alert('Success', 'Visitor signed up successfully!');
+  
+      setFirstName('');
+      setLastName('');
+      setCompany('');
+      setEmail('');
+      setPhone('');
+      setHost('');
+      setHostId(null);
+      setSuggestions([]);
+  
+      navigation.navigate('Welcome', { firstName });
+  
+      setTimeout(() => {
+        navigation.navigate('Arrive');
+      }, 6000);
     } catch (error) {
       console.error('Error signing up visitor:', error);
       Alert.alert('Error', 'An error occurred while signing up.');
     }
-  };
+  };  
 
   return (
     <View style={styles.container}>
