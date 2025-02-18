@@ -1,140 +1,156 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, StyleSheet } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import Config from '../react-native-config';
 import styles from '../styles/GlobalStyles';
-import axios from 'axios';
 
-interface ChecklistItem {
+interface Visitor {
   id: number;
-  checkListDesc: string;
+  visitorFirstName: string;
+  visitorLastName: string;
+  visitorEmail: string;
+  visitorPhoneNumber: string;
 }
 
-const EmployeeLogoutScreen: React.FC = () => {
-  const [pinCode, setPinCode] = useState<string>('');
-  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
-  const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [logoutError, setLogoutError] = useState<string>('');
-  const [successMessage, setSuccessMessage] = useState<string>('');
-  const [activeVisitors, setActiveVisitors] = useState<any[]>([]);
+const Leave: React.FC = () => {
+  const [identifier, setIdentifier] = useState("");
+  const [suggestions, setSuggestions] = useState<Visitor[]>([]);
+  const [activeVisitors, setActiveVisitors] = useState<Visitor[]>([]);
+  const [visitorId, setVisitorId] = useState<number | null>(null);
+  const navigation = useNavigation<StackNavigationProp<any>>();
 
-  // useEffect(() => {
-  //   const fetchChecklist = async () => {
-  //     try {
-  //       const response = await axios.get('http://localhost:8080/checklist/getallchecklists');
-  //       if (Array.isArray(response.data)) {
-  //         setChecklist(response.data);
-  //       } else {
-  //         console.error('Invalid response format.');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching checklist:', error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchActiveVisitors = async () => {
+      try {
+        const response = await fetch(`${Config.API_URL}/visitor/getallvisits`);
+        if (!response.ok) {
+          throw new Error("Unable to fetch visitors.");
+        }
+        const data = await response.json();
+        const activeVisitorsList = data
+          .filter((visitor: any) => !visitor.visitEndTime)
+          .map((visitor: any) => ({
+            id: visitor.id,
+            visitorFirstName: visitor.visitorFirstName,
+            visitorLastName: visitor.visitorLastName,
+            visitorEmail: visitor.visitorEmail,
+            visitorPhoneNumber: visitor.visitorPhoneNumber,
+          }));
+        setActiveVisitors(activeVisitorsList);
+      } catch (error) {
+        console.error("Error fetching active visitors:", error);
+      }
+    };
 
-  //   fetchChecklist();
-  // }, []);
+    fetchActiveVisitors();
+  }, []);
 
-  const fetchActiveVisitors = async () => {
-    try {
-      const response = await axios.get("http://localhost:8080/visitor/getallvisits");
-      const activeVisitorsList = response.data
-        .filter((visitor: any) => !visitor.visitEndTime)
-        .map((visitor: any) => ({
-          id: visitor.id,
-          visitorFirstName: visitor.visitorFirstName,
-          visitorLastName: visitor.visitorLastName,
-          visitorEmail: visitor.visitorEmail,
-          visitorPhoneNumber: visitor.visitorPhoneNumber,
-        }));
-      setActiveVisitors(activeVisitorsList);
-    } catch (error) {
-      console.error("Error fetching active visitors:", error);
+  const handleInputChange = (text: string) => {
+    setIdentifier(text);
+
+    if (text.length >= 3) {
+      const matches = activeVisitors.filter(
+        (visitor) =>
+          (visitor.visitorFirstName && visitor.visitorFirstName.toLowerCase().includes(text.toLowerCase())) ||
+          (visitor.visitorLastName && visitor.visitorLastName.toLowerCase().includes(text.toLowerCase())) ||
+          (visitor.visitorEmail && visitor.visitorEmail.toLowerCase().includes(text.toLowerCase())) ||
+          (visitor.visitorPhoneNumber && visitor.visitorPhoneNumber.includes(text))
+      );
+      setSuggestions(matches);
+    } else {
+      setSuggestions([]);
     }
   };
 
-  const handleCheckboxChange = (value: string) => {
-    setSelectedOptions((prev) => {
-      const updatedSet = new Set(prev);
-      if (updatedSet.has(value)) {
-        updatedSet.delete(value);
-      } else {
-        updatedSet.add(value);
-      }
-      return updatedSet;
-    });
-    setErrorMessage('');
+  const handleSuggestionClick = (visitor: Visitor) => {
+    setIdentifier(visitor.visitorFirstName || visitor.visitorLastName || visitor.visitorEmail || visitor.visitorPhoneNumber);
+    setVisitorId(visitor.id);
+    setSuggestions([]);
   };
 
-  const handleLogout = async () => {
-    if (selectedOptions.size < checklist.length) {
-      setErrorMessage('Please check all the checkboxes before logging out.');
+  const handleSignOut = async () => {
+    if (!identifier.trim()) {
+      Alert.alert("Error", "Please enter a valid name, email, or phone number.");
       return;
     }
 
+    const visitor = activeVisitors.find(
+      (v) =>
+        v.visitorFirstName === identifier ||
+        v.visitorLastName === identifier ||
+        v.visitorEmail === identifier ||
+        v.visitorPhoneNumber === identifier
+    );
+
+    if (!visitor) {
+      Alert.alert("Error", "Visitor not found.");
+      return;
+    }
+
+    console.log("Logging out Visitor ID:", visitor.id);
+
     try {
-      const response = await axios.post('http://localhost:8080/employee/logout', { pinCode });
-      
-      if (response.status === 200) {
-        setSuccessMessage('Logout successful.');
-        setLogoutError('');
+      const response = await fetch(`${Config.API_URL}/visitor/logout?visitorId=${visitor.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        Alert.alert("Success", result.message || "Visitor logged out successfully!");
+        setIdentifier("");
+        setVisitorId(null);
+        setSuggestions([]);
+
+        navigation.navigate('Thanks');
+
+        const timeoutId = setTimeout(() => {
+          navigation.navigate("Leave");
+        }, 6000);
+        return () => clearTimeout(timeoutId);
       } else {
-        setLogoutError(response.statusText || 'Logout failed. Invalid PIN code.');
-        setSuccessMessage('');
+        const errorData = await response.json();
+        Alert.alert("Error", errorData.message || "Failed to log out the visitor.");
       }
     } catch (error) {
-      console.error('Error logging out:', error);
-      setLogoutError('An error occurred while logging out.');
-      setSuccessMessage('');
+      Alert.alert("Error", "An error occurred during logout.");
+      console.error("Logout error:", error);
     }
   };
 
-  const allChecked = selectedOptions.size === checklist.length && checklist.length > 0;
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Employee Logout</Text>
-      <View style={{ flexDirection: 'column', marginBottom: 10 }}>
-        {checklist.length > 0 ? (
-          checklist.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.checkboxContainer}
-              onPress={() => handleCheckboxChange(item.checkListDesc)}
-            >
-              <Text style={styles.checkboxText}>
-                {selectedOptions.has(item.checkListDesc) ? '☑️' : '⬜️'} {item.checkListDesc}
-              </Text>
-            </TouchableOpacity>
-          ))
-        ) : (
-          <Text>Loading checklist...</Text>
-        )}
+      <Text style={styles.title}>Visitor Logout</Text>
+      <View style={styles.formGroup}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter First Name, Last Name, Email, or Phone Number"
+          value={identifier}
+          onChangeText={handleInputChange}
+        />
+        <View style={styles.suggestionsContainer}>
+          {suggestions.length > 0 && (
+            <FlatList
+              data={suggestions}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => handleSuggestionClick(item)}>
+                  <Text style={styles.suggestionText}>
+                    {item.visitorFirstName} {item.visitorLastName}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+        </View>
+      
+        <TouchableOpacity style={styles.customButton} onPress={handleSignOut}>
+          <Text style={styles.buttonText}>Sign Out</Text>
+        </TouchableOpacity>
       </View>
-
-      {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
-
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your pin code"
-        value={pinCode}
-        onChangeText={setPinCode}
-      />
-
-      <TouchableOpacity
-        style={[styles.customButton, { backgroundColor: allChecked ? 'black' : 'gray' }]}
-        onPress={handleLogout}
-        disabled={!allChecked}
-      >
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
-
-      {(logoutError || successMessage) && (
-        <Text style={{ color: logoutError ? 'red' : 'green' }}>
-          {logoutError || successMessage}
-        </Text>
-      )}
     </View>
   );
 };
 
-export default EmployeeLogoutScreen;
+export default Leave;
