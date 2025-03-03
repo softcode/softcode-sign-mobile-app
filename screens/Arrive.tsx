@@ -152,7 +152,7 @@ const Arrive: React.FC = () => {
               data={suggestions}
               keyExtractor={(item) => item.employeeId.toString()} 
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleSuggestionClick(item)}>
+                <TouchableOpacity key={item.id} onPress={() => handleSuggestionClick(item)}>
                   <Text style={styles.suggestionText}>{item.firstName} {item.lastName}</Text>
                 </TouchableOpacity>
               )}

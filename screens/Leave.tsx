@@ -135,7 +135,7 @@ const Leave: React.FC = () => {
               data={suggestions}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleSuggestionClick(item)}>
+                <TouchableOpacity key={item.id} onPress={() => handleSuggestionClick(item)}>
                   <Text style={styles.suggestionText}>
                     {item.visitorFirstName} {item.visitorLastName}
                   </Text>

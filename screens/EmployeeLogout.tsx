@@ -20,7 +20,7 @@ const EmployeeLogoutScreen: React.FC = () => {
   useEffect(() => {
     const fetchChecklist = async () => {
       try {
-        const response = await axios.get(`${Config.API_URL}/checklist/getallchecklists`);
+        const response = await axios.get(`/checklist/getallchecklists`);
         if (Array.isArray(response.data)) {
           setChecklist(response.data);
         } else {
@@ -54,7 +54,7 @@ const EmployeeLogoutScreen: React.FC = () => {
     }
 
     try {
-      const response = await axios.post(`${Config.API_URL}/employee/logout`, { pinCode });
+      const response = await axios.post(`/employee/logout`, { pinCode });
       
       if (response.status === 200) {
         setSuccessMessage('Logout successful.');
@@ -77,9 +77,9 @@ const EmployeeLogoutScreen: React.FC = () => {
       <Text style={styles.title}>Employee Logout</Text>
       <View style={{ flexDirection: 'column', marginBottom: 10 }}>
         {checklist.length > 0 ? (
-          checklist.map((item) => (
+          checklist.map((item, index) => (
             <TouchableOpacity
-              key={item.id}
+              key={index}
               style={styles.checkboxContainer}
               onPress={() => handleCheckboxChange(item.checkListDesc)}
             >

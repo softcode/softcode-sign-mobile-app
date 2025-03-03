@@ -8,6 +8,7 @@ import Welcome from './components/Welcome';
 import EmployeeLogoutScreen from './screens/EmployeeLogout';
 import WelcomeScreen from './screens/WelcomeScreen';
 import ThanksScreen from './screens/ThanksScreen';
+import { setBaseUrl } from './httpUtil';
 
 type RootStackParamList = {
   Home: undefined;
@@ -21,6 +22,7 @@ type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 const App: React.FC = () => {
+  setBaseUrl();
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
