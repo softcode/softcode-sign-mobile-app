@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import Config from '../react-native-config';
 import styles from '../styles/GlobalStyles';
 import axios from 'axios';
@@ -30,7 +30,6 @@ const EmployeeLogoutScreen: React.FC = () => {
         console.error('Error fetching checklist:', error);
       }
     };
-
     fetchChecklist();
   }, []);
 
@@ -47,6 +46,14 @@ const EmployeeLogoutScreen: React.FC = () => {
     setErrorMessage('');
   };
 
+  const resetForm = () => {
+    setPinCode('');
+    setSelectedOptions(new Set());
+    setErrorMessage('');
+    setLogoutError('');
+    setSuccessMessage('');
+  };
+
   const handleLogout = async () => {
     if (selectedOptions.size < checklist.length) {
       setErrorMessage('Please check all the checkboxes before logging out.');
@@ -55,10 +62,15 @@ const EmployeeLogoutScreen: React.FC = () => {
 
     try {
       const response = await axios.post(`/employee/logout`, { pinCode });
-      
+     
       if (response.status === 200) {
-        setSuccessMessage('Logout successful.');
-        setLogoutError('');
+        Alert.alert(
+          'Logout Successful', 
+          'You have been logged out successfully.', 
+          [{ text: 'OK', onPress: resetForm }]
+        );
+        
+        resetForm();
       } else {
         setLogoutError(response.statusText || 'Logout failed. Invalid PIN code.');
         setSuccessMessage('');
@@ -92,16 +104,15 @@ const EmployeeLogoutScreen: React.FC = () => {
           <Text>Loading checklist...</Text>
         )}
       </View>
-
       {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
-
       <TextInput
         style={styles.input}
         placeholder="Enter your pin code"
         value={pinCode}
         onChangeText={setPinCode}
+        secureTextEntry={true}
+        keyboardType="numeric"
       />
-
       <TouchableOpacity
         style={[styles.customButton, { backgroundColor: allChecked ? 'black' : 'gray' }]}
         onPress={handleLogout}
@@ -109,7 +120,6 @@ const EmployeeLogoutScreen: React.FC = () => {
       >
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
-
       {(logoutError || successMessage) && (
         <Text style={{ color: logoutError ? 'red' : 'green' }}>
           {logoutError || successMessage}
