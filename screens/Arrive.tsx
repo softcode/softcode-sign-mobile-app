@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Config from '../react-native-config';
 import styles from '../styles/GlobalStyles';
 import { StackNavigationProp } from '@react-navigation/stack';
+import axios from 'axios';
 
 interface Employee {
   id: number;
@@ -45,13 +47,15 @@ const Arrive: React.FC = () => {
       setSuggestions([]);
       return;
     }
-
+  
     setIsFetching(true);
     try {
-      const response = await fetch(`http://localhost:8097/visitor/employee/search?name=${encodeURIComponent(query)}`);
-      if (response.ok) {
-        const data: Employee[] = await response.json();
-        setSuggestions(data.slice(0, 3));
+      const response = await axios.get(`${Config.API_URL}/visitor/employee/search`, {
+        params: { name: query },
+      });
+  
+      if (response.status === 200) {
+        setSuggestions(response.data.slice(0, 3));
       } else {
         console.error('Failed to fetch host suggestions:', response.statusText);
         setSuggestions([]);
@@ -62,7 +66,7 @@ const Arrive: React.FC = () => {
     } finally {
       setIsFetching(false);
     }
-  };
+  };  
 
   const handleHostChange = (text: string) => {
     setHost(text);
@@ -77,7 +81,7 @@ const Arrive: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!validateInputs()) return;
-
+  
     const visitorData = {
       visitorFirstName: firstName,
       visitorLastName: lastName,
@@ -86,40 +90,33 @@ const Arrive: React.FC = () => {
       visitorPhoneNumber: phone,
       visitorHostId: hostId,
     };
-
+  
     try {
-      const response = await fetch('http://localhost:8097/visitor/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(visitorData),
+      const response = await axios.post(`${Config.API_URL}/visitor/create`, visitorData, {
+        headers: { 'Content-Type': 'application/json' }
       });
-
-      if (response.ok) {
-        Alert.alert('Success', 'Visitor signed up successfully!');
-
-        setFirstName('');
-        setLastName('');
-        setCompany('');
-        setEmail('');
-        setPhone('');
-        setHost('');
-        setHostId(null);
-        setSuggestions([]);
-
-        navigation.navigate('Welcome', { firstName });
-
-        setTimeout(() => {
-          navigation.navigate('Arrive');
-        }, 6000);
-      } else {
-        const errorData = await response.json();
-        Alert.alert('Error', errorData.message || 'Failed to sign up visitor.');
-      }
+  
+      Alert.alert('Success', 'Visitor signed up successfully!');
+  
+      setFirstName('');
+      setLastName('');
+      setCompany('');
+      setEmail('');
+      setPhone('');
+      setHost('');
+      setHostId(null);
+      setSuggestions([]);
+  
+      navigation.navigate('Welcome', { firstName });
+  
+      setTimeout(() => {
+        navigation.navigate('Arrive');
+      }, 6000);
     } catch (error) {
       console.error('Error signing up visitor:', error);
       Alert.alert('Error', 'An error occurred while signing up.');
     }
-  };
+  };  
 
   return (
     <View style={styles.container}>
@@ -155,7 +152,7 @@ const Arrive: React.FC = () => {
               data={suggestions}
               keyExtractor={(item) => item.employeeId.toString()} 
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleSuggestionClick(item)}>
+                <TouchableOpacity key={item.id} onPress={() => handleSuggestionClick(item)}>
                   <Text style={styles.suggestionText}>{item.firstName} {item.lastName}</Text>
                 </TouchableOpacity>
               )}

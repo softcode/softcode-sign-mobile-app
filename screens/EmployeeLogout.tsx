@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import Config from '../react-native-config';
 import styles from '../styles/GlobalStyles';
+import axios from 'axios';
 
 interface ChecklistItem {
   id: number;
@@ -18,11 +20,9 @@ const EmployeeLogoutScreen: React.FC = () => {
   useEffect(() => {
     const fetchChecklist = async () => {
       try {
-        const response = await fetch('http://localhost:8097/checklist/getallchecklists');
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          setChecklist(data);
+        const response = await axios.get(`/checklist/getallchecklists`);
+        if (Array.isArray(response.data)) {
+          setChecklist(response.data);
         } else {
           console.error('Invalid response format.');
         }
@@ -30,7 +30,6 @@ const EmployeeLogoutScreen: React.FC = () => {
         console.error('Error fetching checklist:', error);
       }
     };
-
     fetchChecklist();
   }, []);
 
@@ -47,6 +46,14 @@ const EmployeeLogoutScreen: React.FC = () => {
     setErrorMessage('');
   };
 
+  const resetForm = () => {
+    setPinCode('');
+    setSelectedOptions(new Set());
+    setErrorMessage('');
+    setLogoutError('');
+    setSuccessMessage('');
+  };
+
   const handleLogout = async () => {
     if (selectedOptions.size < checklist.length) {
       setErrorMessage('Please check all the checkboxes before logging out.');
@@ -54,24 +61,18 @@ const EmployeeLogoutScreen: React.FC = () => {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:8097/employee/logout?pinCode=${pinCode}`,
-        {
-          method: 'POST',
-        }
-      );
-
-      const contentType = response.headers.get('content-type');
-      if (response.ok) {
-        setSuccessMessage('Logout successful.');
-        setLogoutError('');
-      } else if (contentType && contentType.includes('application/json')) {
-        const errorData = await response.json();
-        setLogoutError(errorData.message || 'Logout failed. Invalid pin code.');
-        setSuccessMessage('');
+      const response = await axios.post(`/employee/logout`, { pinCode });
+     
+      if (response.status === 200) {
+        Alert.alert(
+          'Logout Successful', 
+          'You have been logged out successfully.', 
+          [{ text: 'OK', onPress: resetForm }]
+        );
+        
+        resetForm();
       } else {
-        const errorText = await response.text();
-        setLogoutError(errorText || 'An unexpected error occurred.');
+        setLogoutError(response.statusText || 'Logout failed. Invalid PIN code.');
         setSuccessMessage('');
       }
     } catch (error) {
@@ -88,9 +89,9 @@ const EmployeeLogoutScreen: React.FC = () => {
       <Text style={styles.title}>Employee Logout</Text>
       <View style={{ flexDirection: 'column', marginBottom: 10 }}>
         {checklist.length > 0 ? (
-          checklist.map((item) => (
+          checklist.map((item, index) => (
             <TouchableOpacity
-              key={item.id}
+              key={index}
               style={styles.checkboxContainer}
               onPress={() => handleCheckboxChange(item.checkListDesc)}
             >
@@ -103,27 +104,22 @@ const EmployeeLogoutScreen: React.FC = () => {
           <Text>Loading checklist...</Text>
         )}
       </View>
-
       {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
-
       <TextInput
         style={styles.input}
         placeholder="Enter your pin code"
         value={pinCode}
         onChangeText={setPinCode}
+        secureTextEntry={true}
+        keyboardType="numeric"
       />
-
       <TouchableOpacity
-        style={[
-          styles.customButton,
-          { backgroundColor: allChecked ? 'black' : 'gray' },
-        ]}
+        style={[styles.customButton, { backgroundColor: allChecked ? 'black' : 'gray' }]}
         onPress={handleLogout}
         disabled={!allChecked}
       >
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
-
       {(logoutError || successMessage) && (
         <Text style={{ color: logoutError ? 'red' : 'green' }}>
           {logoutError || successMessage}

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import axios from 'axios';
+import Config from '../react-native-config';
 import styles from '../styles/GlobalStyles';
 
 interface Visitor {
@@ -22,12 +24,9 @@ const Leave: React.FC = () => {
   useEffect(() => {
     const fetchActiveVisitors = async () => {
       try {
-        const response = await fetch("http://localhost:8097/visitor/getallvisits");
-        if (!response.ok) {
-          throw new Error("Unable to fetch visitors.");
-        }
-        const data = await response.json();
-        const activeVisitorsList = data
+        const response = await axios.get(`${Config.API_URL}/visitor/getallvisits`);
+        
+        const activeVisitorsList = response.data
           .filter((visitor: any) => !visitor.visitEndTime)
           .map((visitor: any) => ({
             id: visitor.id,
@@ -39,6 +38,7 @@ const Leave: React.FC = () => {
         setActiveVisitors(activeVisitorsList);
       } catch (error) {
         console.error("Error fetching active visitors:", error);
+        Alert.alert("Error", "Unable to fetch active visitors");
       }
     };
 
@@ -47,6 +47,7 @@ const Leave: React.FC = () => {
 
   const handleInputChange = (text: string) => {
     setIdentifier(text);
+    setVisitorId(null);
 
     if (text.length >= 3) {
       const matches = activeVisitors.filter(
@@ -63,7 +64,8 @@ const Leave: React.FC = () => {
   };
 
   const handleSuggestionClick = (visitor: Visitor) => {
-    setIdentifier(visitor.visitorFirstName || visitor.visitorLastName || visitor.visitorEmail || visitor.visitorPhoneNumber);
+    const fullName = `${visitor.visitorFirstName} ${visitor.visitorLastName}`.trim();
+    setIdentifier(fullName);
     setVisitorId(visitor.id);
     setSuggestions([]);
   };
@@ -75,11 +77,12 @@ const Leave: React.FC = () => {
     }
 
     const visitor = activeVisitors.find(
-      (v) =>
-        v.visitorFirstName === identifier ||
-        v.visitorLastName === identifier ||
-        v.visitorEmail === identifier ||
-        v.visitorPhoneNumber === identifier
+      (v) => {
+        const fullName = `${v.visitorFirstName} ${v.visitorLastName}`.trim();
+        return fullName === identifier ||
+               v.visitorEmail === identifier ||
+               v.visitorPhoneNumber === identifier
+      }
     );
 
     if (!visitor) {
@@ -90,30 +93,32 @@ const Leave: React.FC = () => {
     console.log("Logging out Visitor ID:", visitor.id);
 
     try {
-      const response = await fetch(`http://localhost:8097/visitor/logout?visitorId=${visitor.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axios.patch(`${Config.API_URL}/visitor/logout`, 
+        { visitorId: visitor.id },
+        {
+          headers: { 
+            'Content-Type': 'application/json',
+          }
+        }
+      );
 
-      if (response.ok) {
-        const result = await response.json();
-        Alert.alert("Success", result.message || "Visitor logged out successfully!");
-        setIdentifier("");
-        setVisitorId(null);
-        setSuggestions([]);
+      Alert.alert("Success", response.data.message || "Visitor logged out successfully!");
+      setIdentifier("");
+      setVisitorId(null);
+      setSuggestions([]);
 
-        navigation.navigate('Thanks');
+      navigation.navigate('Thanks');
 
-        const timeoutId = setTimeout(() => {
-          navigation.navigate("Leave");
-        }, 6000);
-        return () => clearTimeout(timeoutId);
-      } else {
-        const errorData = await response.json();
-        Alert.alert("Error", errorData.message || "Failed to log out the visitor.");
-      }
+      setTimeout(() => {
+        navigation.navigate("Leave");
+      }, 6000);
     } catch (error) {
-      Alert.alert("Error", "An error occurred during logout.");
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || "Failed to log out the visitor.";
+        Alert.alert("Error", errorMessage);
+      } else {
+        Alert.alert("Error", "An unexpected error occurred during logout.");
+      }
       console.error("Logout error:", error);
     }
   };
@@ -134,7 +139,7 @@ const Leave: React.FC = () => {
               data={suggestions}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleSuggestionClick(item)}>
+                <TouchableOpacity key={item.id} onPress={() => handleSuggestionClick(item)}>
                   <Text style={styles.suggestionText}>
                     {item.visitorFirstName} {item.visitorLastName}
                   </Text>

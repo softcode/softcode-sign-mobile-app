@@ -72,7 +72,6 @@ const GlobalStyles = StyleSheet.create({
     marginVertical: 10,
     borderRadius: 5,
     width: '100%',
-    height: 40,
   },
   suggestionContainer: {
     borderWidth: 1,

@@ -1,0 +1,89 @@
+[33mcommit a626f79362f9230bf972e3f70e8afd4af2552c11[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/Task01-softcode-sign-mobile-app-frontend[m[33m)[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Thu Feb 6 15:50:11 2025 +0100
+
+    Fix the host id
+
+[33mcommit 22b042d02a0f8ee4563b7661c028c2459803b8cd[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Sat Feb 1 16:33:32 2025 +0100
+
+    Add a redirect page after sign-out
+
+[33mcommit b230255e5342414e2c716ab7657061ac628c86c6[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Sat Feb 1 13:54:48 2025 +0100
+
+    Fix the error of signout page
+
+[33mcommit d5ca6939137c97c9d75ac959baddcb469eb4cdb7[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Fri Jan 31 21:24:48 2025 +0100
+
+    Fix the visitor logout page
+
+[33mcommit 71e30108f8d4b30c42309eacbae1ffc31ccb3539[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Fri Jan 31 21:19:30 2025 +0100
+
+    Fix the suggestions dropdown
+
+[33mcommit f3c7215d8fe79e974dd8ce08f83795dfee2432f3[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Fri Jan 31 16:06:02 2025 +0100
+
+    Fix the signup form
+
+[33mcommit e59db9a72619d61a92d4c9766509445128fb7cc4[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Wed Jan 29 16:59:34 2025 +0100
+
+    Fix the welcome page
+
+[33mcommit e7736df6f08ff2cce15e546fcf76f9d54c86afd3[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Wed Jan 29 16:34:14 2025 +0100
+
+    Redirect to the welcome page
+
+[33mcommit b5749eec9eda9e2a8595a6d3afca098f9a8e96ca[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Wed Jan 29 15:37:02 2025 +0100
+
+    Add form validation
+
+[33mcommit b58bae80395ded7056e6f8cb067498370e5afe8a[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Wed Jan 29 13:44:06 2025 +0100
+
+    Add first and last name
+
+[33mcommit bd327a782ef011741a0531e7d1f04589f68669a2[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Sun Jan 5 19:29:13 2025 +0100
+
+    Add employee logout
+
+[33mcommit 27f5468217d8e38144d5797a6c959f7af1ff62a3[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Tue Oct 8 18:14:01 2024 +0200
+
+    Fetch data from demo endpoint
+
+[33mcommit 996cf0b6f4dac920bd11aa70d4bec29c69d92f74[m[33m ([m[1;31mupstream/feature/Task01-create-softcode-sign-app[m[33m, [m[1;31morigin/feature/Task01-create-softcode-sign-app[m[33m)[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Tue Oct 1 10:34:49 2024 +0200
+
+    Add arrive and leave page
+
+[33mcommit 39bfc530b757d4df43104d3fb77bcdf5256c0673[m[33m ([m[1;31mupstream/master[m[33m, [m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Mon Sep 30 09:29:29 2024 +0200
+
+    git commit -m "Setup SoftCode Sign App"
+
+[33mcommit 3ee0f13d591ca529f0ae54094ff6c414fdb6aa49[m
+Author: nazrul <nazrulwo@gmail.com>
+Date:   Sun Sep 29 18:57:13 2024 +0200
+
+    Created a new Expo app
