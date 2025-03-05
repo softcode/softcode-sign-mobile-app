@@ -47,6 +47,7 @@ const Leave: React.FC = () => {
 
   const handleInputChange = (text: string) => {
     setIdentifier(text);
+    setVisitorId(null);
 
     if (text.length >= 3) {
       const matches = activeVisitors.filter(
@@ -63,7 +64,8 @@ const Leave: React.FC = () => {
   };
 
   const handleSuggestionClick = (visitor: Visitor) => {
-    setIdentifier(visitor.visitorFirstName || visitor.visitorLastName || visitor.visitorEmail || visitor.visitorPhoneNumber);
+    const fullName = `${visitor.visitorFirstName} ${visitor.visitorLastName}`.trim();
+    setIdentifier(fullName);
     setVisitorId(visitor.id);
     setSuggestions([]);
   };
@@ -75,11 +77,12 @@ const Leave: React.FC = () => {
     }
 
     const visitor = activeVisitors.find(
-      (v) =>
-        v.visitorFirstName === identifier ||
-        v.visitorLastName === identifier ||
-        v.visitorEmail === identifier ||
-        v.visitorPhoneNumber === identifier
+      (v) => {
+        const fullName = `${v.visitorFirstName} ${v.visitorLastName}`.trim();
+        return fullName === identifier ||
+               v.visitorEmail === identifier ||
+               v.visitorPhoneNumber === identifier
+      }
     );
 
     if (!visitor) {
