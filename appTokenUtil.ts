@@ -7,8 +7,6 @@ export const generateToken = () => {
     const message = `${timestamp}`;
 
     const secret = Config.SHARED_SECRET || "";
-    console.log("secret loaded", secret !== "");
-    console.log("Secret..", secret);
 
     // Generate HMAC-SHA256 signature
     const signature = CryptoJS.HmacSHA256(message, secret);
@@ -20,6 +18,5 @@ export const generateToken = () => {
 
 export const getAppTokenHeader = () => {
     const token = { "X-App-Token": `${generateToken()}` };
-    console.log(token);
     return token;
 };
