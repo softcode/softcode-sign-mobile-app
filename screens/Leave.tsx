@@ -90,7 +90,6 @@ const Leave: React.FC = () => {
       return;
     }
 
-    console.log("Logging out Visitor ID:", visitor.id);
 
     try {
       const response = await axios.patch(`${Config.API_URL}/visitor/logout`, 
