@@ -103,6 +103,7 @@ const GlobalStyles = StyleSheet.create({
     color: 'red',
     fontSize: 12,
     marginBottom: 10,
+    textAlign: 'left',
   },
   text: {
     fontSize: 24,
@@ -134,6 +135,24 @@ const GlobalStyles = StyleSheet.create({
   loading: {
     padding: 12,
     color: '#666',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 50,
+    borderRadius: 2,
+    elevation: 5,
+    width: '80%',
+  },
+  successText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
