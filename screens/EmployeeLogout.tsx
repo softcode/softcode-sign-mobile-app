@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import Config from '../react-native-config';
+import { View, Text, TextInput, TouchableOpacity, Alert, Modal } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import styles from '../styles/GlobalStyles';
 import axios from 'axios';
 
@@ -9,6 +10,11 @@ interface ChecklistItem {
   checkListDesc: string;
 }
 
+type RootStackParamList = {
+  Home: undefined;
+  EmployeeLogout: undefined;
+};
+
 const EmployeeLogoutScreen: React.FC = () => {
   const [pinCode, setPinCode] = useState<string>('');
   const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
@@ -16,6 +22,9 @@ const EmployeeLogoutScreen: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [logoutError, setLogoutError] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
+  const [showPopup, setShowPopup] = useState<boolean>(false);
+  
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   useEffect(() => {
     const fetchChecklist = async () => {
@@ -62,15 +71,15 @@ const EmployeeLogoutScreen: React.FC = () => {
 
     try {
       const response = await axios.post(`/employee/logout`, { pinCode });
-     
+
       if (response.status === 200) {
-        Alert.alert(
-          'Logout Successful', 
-          'You have been logged out successfully.', 
-          [{ text: 'OK', onPress: resetForm }]
-        );
-        
+        setShowPopup(true);
         resetForm();
+
+        setTimeout(() => {
+          setShowPopup(false);
+          navigation.navigate('Home');
+        }, 2000);
       } else {
         setLogoutError(response.statusText || 'Logout failed. Invalid PIN code.');
         setSuccessMessage('');
@@ -120,6 +129,15 @@ const EmployeeLogoutScreen: React.FC = () => {
       >
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
+
+      <Modal visible={showPopup} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.successText}>You have been logged out successfully.</Text>
+          </View>
+        </View>
+      </Modal>
+
       {(logoutError || successMessage) && (
         <Text style={{ color: logoutError ? 'red' : 'green' }}>
           {logoutError || successMessage}
