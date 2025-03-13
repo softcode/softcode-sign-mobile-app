@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Config from '../react-native-config';
 import styles from '../styles/GlobalStyles';
@@ -25,6 +25,7 @@ const Arrive: React.FC = () => {
   const [suggestions, setSuggestions] = useState<Employee[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const [errors, setErrors] = useState({ firstName: false, lastName: false, phone: false, host: false });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const validateInputs = () => {
     const newErrors = {
@@ -79,6 +80,27 @@ const Arrive: React.FC = () => {
     setSuggestions([]);
   };
 
+  const handlePhoneChange = (text: string) => {
+    const formattedText = text.replace(/[^0-9+-]/g, '');
+    setPhone(formattedText);
+  
+    const digitsOnly = formattedText.replace(/[^0-9]/g, '');
+    if (digitsOnly.length >= 9) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        phone: false,
+      }));
+    }
+  };
+  
+  const handlePhoneBlur = () => {
+    const digitsOnly = phone.replace(/[^0-9]/g, '');
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      phone: digitsOnly.length < 9,
+    }));
+  };
+
   const handleSubmit = async () => {
     if (!validateInputs()) return;
   
@@ -96,8 +118,16 @@ const Arrive: React.FC = () => {
         headers: { 'Content-Type': 'application/json' }
       });
   
-      Alert.alert('Success', 'Visitor signed up successfully!');
-  
+      setShowSuccessModal(true);
+
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        navigation.navigate('Welcome', { firstName });
+        setTimeout(() => {
+          navigation.navigate('Home');
+        }, 6000);
+      }, 2000);
+
       setFirstName('');
       setLastName('');
       setCompany('');
@@ -107,11 +137,6 @@ const Arrive: React.FC = () => {
       setHostId(null);
       setSuggestions([]);
   
-      navigation.navigate('Welcome', { firstName });
-  
-      setTimeout(() => {
-        navigation.navigate('Arrive');
-      }, 6000);
     } catch (error) {
       console.error('Error signing up visitor:', error);
       Alert.alert('Error', 'An error occurred while signing up.');
@@ -132,8 +157,15 @@ const Arrive: React.FC = () => {
 
       <TextInput style={styles.input} placeholder="Email (Optional)" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
 
-      <TextInput style={[styles.input, errors.phone && styles.inputError]} placeholder="Phone Number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
-      {errors.phone && <Text style={styles.errorText}>Required</Text>}
+      <TextInput
+        style={[styles.input, errors.phone && styles.inputError]}
+        placeholder="Phone Number"
+        value={phone}
+        onChangeText={handlePhoneChange}
+        onBlur={handlePhoneBlur}
+        keyboardType="phone-pad"
+      />
+      {errors.phone && <Text style={styles.errorText}>Phone must have at least 9 digits.</Text>}
           
       <View style={styles.formGroup}>
         <TextInput
@@ -162,6 +194,13 @@ const Arrive: React.FC = () => {
         <TouchableOpacity style={styles.customButton} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
+        <Modal visible={showSuccessModal} transparent animationType="fade">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.successText}>Visitor signed up successfully!</Text>
+            </View>
+          </View>
+        </Modal>
       </View>
     </View>
   );

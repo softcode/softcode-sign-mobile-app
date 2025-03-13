@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, Modal } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import axios from 'axios';
@@ -19,13 +19,13 @@ const Leave: React.FC = () => {
   const [suggestions, setSuggestions] = useState<Visitor[]>([]);
   const [activeVisitors, setActiveVisitors] = useState<Visitor[]>([]);
   const [visitorId, setVisitorId] = useState<number | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigation = useNavigation<StackNavigationProp<any>>();
 
   useEffect(() => {
     const fetchActiveVisitors = async () => {
       try {
         const response = await axios.get(`${Config.API_URL}/visitor/getallvisits`);
-        
         const activeVisitorsList = response.data
           .filter((visitor: any) => !visitor.visitEndTime)
           .map((visitor: any) => ({
@@ -38,7 +38,6 @@ const Leave: React.FC = () => {
         setActiveVisitors(activeVisitorsList);
       } catch (error) {
         console.error("Error fetching active visitors:", error);
-        Alert.alert("Error", "Unable to fetch active visitors");
       }
     };
 
@@ -72,7 +71,7 @@ const Leave: React.FC = () => {
 
   const handleSignOut = async () => {
     if (!identifier.trim()) {
-      Alert.alert("Error", "Please enter a valid name, email, or phone number.");
+      alert("Please enter a valid name, email, or phone number.");
       return;
     }
 
@@ -86,38 +85,24 @@ const Leave: React.FC = () => {
     );
 
     if (!visitor) {
-      Alert.alert("Error", "Visitor not found.");
+      alert("Visitor not found.");
       return;
     }
 
-
     try {
-      const response = await axios.patch(`${Config.API_URL}/visitor/logout`, 
+      await axios.patch(`${Config.API_URL}/visitor/logout`, 
         { visitorId: visitor.id },
-        {
-          headers: { 
-            'Content-Type': 'application/json',
-          }
-        }
+        { headers: { 'Content-Type': 'application/json' } }
       );
 
-      Alert.alert("Success", response.data.message || "Visitor logged out successfully!");
-      setIdentifier("");
-      setVisitorId(null);
-      setSuggestions([]);
-
-      navigation.navigate('Thanks');
-
+      setShowSuccessModal(true);
       setTimeout(() => {
-        navigation.navigate("Leave");
-      }, 6000);
+        setShowSuccessModal(false);
+        navigation.navigate('Thanks');
+      }, 2000);
+
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message || "Failed to log out the visitor.";
-        Alert.alert("Error", errorMessage);
-      } else {
-        Alert.alert("Error", "An unexpected error occurred during logout.");
-      }
+      alert("Failed to log out the visitor.");
       console.error("Logout error:", error);
     }
   };
@@ -152,6 +137,15 @@ const Leave: React.FC = () => {
           <Text style={styles.buttonText}>Sign Out</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Success Popup Modal */}
+      <Modal visible={showSuccessModal} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.successText}>Visitor signed out successfully!</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

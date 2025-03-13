@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import Welcome from '../components/Welcome';
+import Welcome from '../components/WelcomeScreen';
 import styles from '../styles/GlobalStyles';
 
 const HomeScreen = ({ navigation }: any) => {
@@ -24,9 +24,10 @@ const HomeScreen = ({ navigation }: any) => {
       </View>
       <View style={styles.bottomLink}>
         <TouchableOpacity
+          style={styles.logoutButton}
           onPress={() => navigation.navigate('EmployeeLogout')}
         >
-          <Text style={styles.linkText}>Employee Logout</Text>
+          <Text style={styles.logoutButtonText}>Employee Logout</Text>
         </TouchableOpacity>
       </View>
     </View>
