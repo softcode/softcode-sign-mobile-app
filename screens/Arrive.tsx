@@ -82,15 +82,24 @@ const Arrive: React.FC = () => {
 
   const handlePhoneChange = (text: string) => {
     const formattedText = text.replace(/[^0-9+-]/g, '');
-  
     setPhone(formattedText);
   
     const digitsOnly = formattedText.replace(/[^0-9]/g, '');
+    if (digitsOnly.length >= 9) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        phone: false,
+      }));
+    }
+  };
+  
+  const handlePhoneBlur = () => {
+    const digitsOnly = phone.replace(/[^0-9]/g, '');
     setErrors((prevErrors) => ({
       ...prevErrors,
       phone: digitsOnly.length < 9,
     }));
-  };  
+  };
 
   const handleSubmit = async () => {
     if (!validateInputs()) return;
@@ -114,6 +123,9 @@ const Arrive: React.FC = () => {
       setTimeout(() => {
         setShowSuccessModal(false);
         navigation.navigate('Welcome', { firstName });
+        setTimeout(() => {
+          navigation.navigate('Home');
+        }, 6000);
       }, 2000);
 
       setFirstName('');
@@ -125,11 +137,6 @@ const Arrive: React.FC = () => {
       setHostId(null);
       setSuggestions([]);
   
-      navigation.navigate('Welcome', { firstName });
-  
-      setTimeout(() => {
-        navigation.navigate('Arrive');
-      }, 6000);
     } catch (error) {
       console.error('Error signing up visitor:', error);
       Alert.alert('Error', 'An error occurred while signing up.');
@@ -155,6 +162,7 @@ const Arrive: React.FC = () => {
         placeholder="Phone Number"
         value={phone}
         onChangeText={handlePhoneChange}
+        onBlur={handlePhoneBlur}
         keyboardType="phone-pad"
       />
       {errors.phone && <Text style={styles.errorText}>Phone must have at least 9 digits.</Text>}

@@ -8,19 +8,9 @@ type RouteParams = {
   firstName?: string;
 };
 
-const WelcomeScreen: React.FC = () => {
+const Welcome: React.FC = () => {
   const route = useRoute<RouteProp<{ params: RouteParams }, 'params'>>();
-  const navigation = useNavigation<StackNavigationProp<any>>();
-
   const { firstName = 'Guest' } = route.params || {};
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('Home');
-    }, 6000);
-
-    return () => clearTimeout(timer);
-  }, [navigation]);
 
   return (
     <View style={styles.container}>
@@ -30,4 +20,4 @@ const WelcomeScreen: React.FC = () => {
   );
 };
 
-export default WelcomeScreen;
+export default Welcome;

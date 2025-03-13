@@ -136,6 +136,21 @@ const GlobalStyles = StyleSheet.create({
     padding: 12,
     color: '#666',
   },
+  logoutButton: {
+    backgroundColor: 'white',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#000', 
+    alignItems: 'center',
+    marginTop: 10,
+  },  
+  logoutButtonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },  
   modalContainer: {
     flex: 1,
     justifyContent: 'center',

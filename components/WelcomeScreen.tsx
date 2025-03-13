@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import styles from '../styles/GlobalStyles';
 
-const Welcome: React.FC = () => {
+const WelcomeScreen: React.FC = () => {
   return (
     <View style={styles.topSection}>
       <Text style={styles.welcomeText}>Welcome to</Text>
@@ -15,4 +15,4 @@ const Welcome: React.FC = () => {
   );
 };
 
-export default Welcome;
+export default WelcomeScreen;

@@ -1,11 +1,11 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from './screens/Home';
+import Home from './screens/Home';
 import Arrive from './screens/Arrive';
 import Leave from './screens/Leave';
 import EmployeeLogoutScreen from './screens/EmployeeLogout';
-import WelcomeScreen from './screens/WelcomeScreen';
+import Welcome from './screens/Welcome';
 import ThanksScreen from './screens/ThanksScreen';
 import { setBaseUrl } from './httpUtil';
 
@@ -25,10 +25,10 @@ const App: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} options={{ title: '' }} />
+        <Stack.Screen name="Home" component={Home} options={{ title: '' }} />
         <Stack.Screen name="Arrive" component={Arrive} options={{ title: 'Arrive' }} />
         <Stack.Screen name="Leave" component={Leave} options={{ title: 'Leave' }} />
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Welcome" component={Welcome} />
         <Stack.Screen name="Thanks" component={ThanksScreen} />
         <Stack.Screen
           name="EmployeeLogout"
