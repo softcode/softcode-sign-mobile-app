@@ -94,13 +94,7 @@ const Leave: React.FC = () => {
         { visitorId: visitor.id },
         { headers: { 'Content-Type': 'application/json' } }
       );
-
-      setShowSuccessModal(true);
-      setTimeout(() => {
-        setShowSuccessModal(false);
-        navigation.navigate('Thanks');
-      }, 2000);
-
+      navigation.navigate('Thanks');
     } catch (error) {
       alert("Failed to log out the visitor.");
       console.error("Logout error:", error);
@@ -137,15 +131,6 @@ const Leave: React.FC = () => {
           <Text style={styles.buttonText}>Sign Out</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Success Popup Modal */}
-      <Modal visible={showSuccessModal} transparent animationType="fade">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.successText}>Visitor signed out successfully!</Text>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };

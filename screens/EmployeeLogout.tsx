@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import styles from '../styles/GlobalStyles';
@@ -22,7 +22,6 @@ const EmployeeLogoutScreen: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [logoutError, setLogoutError] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
-  const [showPopup, setShowPopup] = useState<boolean>(false);
   
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
@@ -60,7 +59,6 @@ const EmployeeLogoutScreen: React.FC = () => {
     setSelectedOptions(new Set());
     setErrorMessage('');
     setLogoutError('');
-    setSuccessMessage('');
   };
 
   const handleLogout = async () => {
@@ -73,11 +71,10 @@ const EmployeeLogoutScreen: React.FC = () => {
       const response = await axios.post(`/employee/logout`, { pinCode });
 
       if (response.status === 200) {
-        setShowPopup(true);
+        setSuccessMessage('You have been logged out successfully.');
         resetForm();
 
         setTimeout(() => {
-          setShowPopup(false);
           navigation.navigate('Home');
         }, 2000);
       } else {
@@ -129,17 +126,8 @@ const EmployeeLogoutScreen: React.FC = () => {
       >
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
-
-      <Modal visible={showPopup} transparent animationType="fade">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.successText}>You have been logged out successfully.</Text>
-          </View>
-        </View>
-      </Modal>
-
       {(logoutError || successMessage) && (
-        <Text style={{ color: logoutError ? 'red' : 'green' }}>
+        <Text style={{ color: logoutError ? 'red' : 'green', marginTop: 10 }}>
           {logoutError || successMessage}
         </Text>
       )}

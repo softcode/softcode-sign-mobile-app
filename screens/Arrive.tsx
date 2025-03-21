@@ -117,16 +117,9 @@ const Arrive: React.FC = () => {
       const response = await axios.post(`${Config.API_URL}/visitor/create`, visitorData, {
         headers: { 'Content-Type': 'application/json' }
       });
-  
-      setShowSuccessModal(true);
 
-      setTimeout(() => {
-        setShowSuccessModal(false);
-        navigation.navigate('Welcome', { firstName });
-        setTimeout(() => {
-          navigation.navigate('Home');
-        }, 6000);
-      }, 2000);
+      navigation.navigate('Welcome', { firstName });
+      
 
       setFirstName('');
       setLastName('');
@@ -194,13 +187,6 @@ const Arrive: React.FC = () => {
         <TouchableOpacity style={styles.customButton} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-        <Modal visible={showSuccessModal} transparent animationType="fade">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.successText}>Visitor signed up successfully!</Text>
-            </View>
-          </View>
-        </Modal>
       </View>
     </View>
   );
