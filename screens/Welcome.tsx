@@ -10,7 +10,12 @@ type RouteParams = {
 
 const Welcome: React.FC = () => {
   const route = useRoute<RouteProp<{ params: RouteParams }, 'params'>>();
+  const navigation = useNavigation<StackNavigationProp<any>>();
   const { firstName = 'Guest' } = route.params || {};
+
+  setTimeout(() => {
+    navigation.navigate('Home');
+  }, 6000);
 
   return (
     <View style={styles.container}>
