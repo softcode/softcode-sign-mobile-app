@@ -107,7 +107,7 @@ const Leave: React.FC = () => {
       <View style={styles.formGroup}>
         <TextInput
           style={styles.input}
-          placeholder="Enter First Name, Last Name, Email, or Phone Number"
+          placeholder="Enter First Name, Last Name, or Email"
           value={identifier}
           onChangeText={handleInputChange}
         />
