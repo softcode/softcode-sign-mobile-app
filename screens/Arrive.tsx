@@ -31,7 +31,7 @@ const Arrive: React.FC = () => {
     const newErrors = {
       firstName: !firstName.trim(),
       lastName: !lastName.trim(),
-      phone: !phone.trim(),
+      phone: phone.replace(/[^0-9]/g, '').length < 9,
       host: !host.trim(),
     };
     setErrors(newErrors);
@@ -86,9 +86,10 @@ const Arrive: React.FC = () => {
   
     const digitsOnly = formattedText.replace(/[^0-9]/g, '');
     if (digitsOnly.length >= 9) {
+      const digitsOnly = formattedText.replace(/[^0-9]/g, '');
       setErrors((prevErrors) => ({
         ...prevErrors,
-        phone: false,
+        phone: digitsOnly.length < 9,
       }));
     }
   };
@@ -155,7 +156,6 @@ const Arrive: React.FC = () => {
         placeholder="Phone Number"
         value={phone}
         onChangeText={handlePhoneChange}
-        onBlur={handlePhoneBlur}
         keyboardType="phone-pad"
       />
       {errors.phone && <Text style={styles.errorText}>Phone must have at least 9 digits.</Text>}
